@@ -12,7 +12,7 @@ class Example extends React.Component {
   constructor(props, context) {
     super(props, context);
 
-    this.state = { rows: this.createRows(5)  };
+    this.state = { rows: this.createRows(1)  };
 
     this._columns = [
         { key: 'risk_id', name: 'Identificador del Riesgo', editable: true },
@@ -63,6 +63,9 @@ class Example extends React.Component {
   };
 
   handleAddRow = ({ newRowIndex }) => {
+    console.log(this.state.rows[0].risk);
+    requestGet();
+    requestPost();
     const newRow = {
       value: newRowIndex,
       userStory: '',
@@ -102,6 +105,45 @@ class Example extends React.Component {
         minHeight={500}
         onGridRowsUpdated={this.handleGridRowsUpdated}
         toolbar={<Toolbar onAddRow={this.handleAddRow}/>} />);
+  }
+}
+
+async function requestGet() {
+  try {
+    const urlVendor = 'http://localhost:8080/shop/vendors/';
+    let response = await fetch(urlVendor, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    });
+    let responseJson = await response.json();
+    console.log(responseJson)
+    return responseJson.result;
+  } catch(error) {
+
+  }
+}
+
+
+async function requestPost() {
+  try {
+    const urlVendor = 'http://localhost:8080/shop/vendors/';
+    let response = await fetch(urlVendor, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        "name" : 'Sandro'})              
+    });
+    let responseJson = await response.json();
+    console.log(responseJson)
+    return responseJson.result;
+  } catch(error) {
+
   }
 }
 
