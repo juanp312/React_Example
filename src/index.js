@@ -65,7 +65,8 @@ class Example extends React.Component {
   handleAddRow = ({ newRowIndex }) => {
     console.log(this.state.rows[0].risk);
     requestGet();
-    requestPost();
+    console.log(JSON.stringify(this.state.rows));
+    requestPost(this.state.rows);
     const newRow = {
       value: newRowIndex,
       userStory: '',
@@ -127,7 +128,7 @@ async function requestGet() {
 }
 
 
-async function requestPost() {
+async function requestPost(params) {
   try {
     const urlVendor = 'http://localhost:8080/shop/vendors/';
     let response = await fetch(urlVendor, {
@@ -136,8 +137,7 @@ async function requestPost() {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        "name" : 'Sandro'})              
+      body: JSON.stringify(params[0])    
     });
     let responseJson = await response.json();
     console.log(responseJson)
