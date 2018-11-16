@@ -15,14 +15,20 @@ class Example extends React.Component {
     this.state = { rows: this.createRows(1)  };
 
     this._columns = [
-        { key: 'risk_id', name: 'Identificador del Riesgo', editable: true },
-        { key: 'risk', name: 'Riesgo',  editable: true },
+        { key: 'risk_id', name: 'Consecutivo del Riesgo', editable: true },
         { key: 'code', name: 'Codigo',  editable: true },
-        { key: 'procedure', name: 'Procedimiento',  editable: true },
+        { key: 'procedure', name: 'Proceso',  editable: true },
+        { key: 'risk', name: 'Riesgo',  editable: true },        
         { key: 'description', name: 'Descripcion',  editable: true },
         { key: 'cause', name: 'Causa',  editable: true },
-        { key: 'related_risks', name: 'Riesgos Asociados', editable: true },
-        { key: 'risk_factors', name: 'Factores de Riesgo', editable: true }, ];
+        { key: 'legal_risk', name: 'R. Legal', editable: true },
+        { key: 'operative_risk', name: 'R. Operativo', editable: true },
+        { key: 'contagious_risk', name: 'R. de Contagio', editable: true },
+        { key: 'reputational_risk', name: 'R. Reputacional', editable: true },
+        { key: 'risk_client', name: 'Clientes/Asociados', editable: true },
+        { key: 'risk_products', name: 'Productos', editable: true },
+        { key: 'risk_distribution', name: 'Canales de Distribucion', editable: true },
+        { key: 'risk_jurisdiction', name: 'Jurisdiccion', editable: true } ];
 
     this.createRows();  
       
@@ -47,6 +53,10 @@ class Example extends React.Component {
         description: '',
         cause: '',
         related_risks: '',
+        legal_risk: '',
+        operative_risk: '',
+        contagious_risk: '',
+        reputational_risk: '',
         risk_factors: '',
       };
   }
@@ -64,7 +74,7 @@ class Example extends React.Component {
 
   handleAddRow = ({ newRowIndex }) => {
     console.log(this.state.rows[0].risk);
-    requestGet();
+    //requestGet();
     console.log(JSON.stringify(this.state.rows));
     requestPost(this.state.rows);
     const newRow = {
