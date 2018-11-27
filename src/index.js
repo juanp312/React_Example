@@ -64,63 +64,50 @@ class Example extends React.Component {
 
   createRowByOneWithDate = (information) => {
     return {
-       risk_id: '',
-       risk: '',
-       code: '',
-       procedure: '',
-       description: '',
-       cause: '',
-       related_risks: '',
-       legal_risk: '',
-       operative_risk: '',
-       contagious_risk: '',
-       reputational_risk: '',
-       risk_factors: '',
+       risk_id: information.risk_id,
+       risk: information.risk,
+       code: information.code,
+       procedure: information.procedure,
+       description: information.description,
+       cause: information.cause,
+       related_risks: information.related_risks,
+       legal_risk: information.legal_risk,
+       operative_risk: information.operative_risk,
+       contagious_risk: information.contagious_risk,
+       reputational_risk: information.reputational_risk,
+       risk_factors: information.risk_factors
      };
  }
 
-  handleGridRowsUpdated = ({ fromRow, toRow, updated }) => {
-    let rows = this.state.rows.slice();
-
-    for (let i = fromRow; i <= toRow; i++) {
-      let rowToUpdate = rows[i];
-      let updatedRow = update(rowToUpdate, {$merge: updated});
-      rows[i] = updatedRow;
-    }
-    this.setState({ rows });
-  };
-
-  handleAddRow = ({ newRowIndex }) => {
-    //requestGet();
-    console.log(JSON.stringify(this.state.rows));
-    requestPost(this.state.rows);
-    const newRow = {
-      value: newRowIndex,
-      userStory: '',
-      developer: '',
-      epic: ''
-    };
-
-    let rows = this.state.rows.slice();
-    rows = update(rows, {$push: [newRow]});
-    this.setState({ rows });
-  };
-
   restoreInformation = () => {
     console.log("Im in the restore information");
-    let retrievedInformation = requestGet();
-    retrievedInformation.then(function(response) {
-      console.log("im inside the then " + response);
-    });
-    let rows = this.state.rows.slice();
-    console.log(retrievedInformation);
-    for (let index = 0; index < retrievedInformation.length; index++) {
-      console.log("This is the index " + index);
-      const newRow = this.createRowByOneWithDate(retrievedInformation[index]);
-      rows = update(rows, {$push: [newRow]});
+    try {
+      const urlVendor = 'http://localhost:8080/identification/';
+      fetch(urlVendor, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      }).then(response => response.json())
+        .then(data => {
+          console.log(data);
+          if(data.length === 0) {
+            alert("There is no value to return");
+          } else {
+          let rows = this.state.rows.slice();
+          console.log("Im in the show");
+          for (let index = 0; index < data.length; index++) {
+            console.log("This is the index " + index);
+            const newRow = this.createRowByOneWithDate(data[index]);
+            rows = update(rows, {$push: [newRow]});
+          }
+          this.setState({ rows });
+        }
+        });
+    } catch(error) {
+      console.log("There was a error?" + error)
     }
-    this.setState({ rows });
-    
   };
 
   addArrow = () => {
@@ -177,18 +164,16 @@ class Example extends React.Component {
 async function requestGet() {
   try {
     const urlVendor = 'http://localhost:8080/identification/';
-    let response = await fetch(urlVendor, {
+    await fetch(urlVendor, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       }
-    });
-    let responseJson = await response.json();
-    console.log(responseJson)
-    return responseJson.result;
+    }).then(response => response.json())
+      .then(data => this.showInformationInTable(data));
   } catch(error) {
-
+    console.log("There was a error?" + error)
   }
 }
 
@@ -210,7 +195,10 @@ async function requestPost(params) {
   } catch(error) {
 
   }
+
 }
+
+
 
     ReactDOM.render(
         <Example/>,
