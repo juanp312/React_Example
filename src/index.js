@@ -62,6 +62,17 @@ class Example extends React.Component {
       };
   }
 
+  handleGridRowsUpdated = ({ fromRow, toRow, updated }) => {
+    let rows = this.state.rows.slice();
+     for (let i = fromRow; i <= toRow; i++) {
+      let rowToUpdate = rows[i];
+      let updatedRow = update(rowToUpdate, {$merge: updated});
+      rows[i] = updatedRow;
+    }
+    this.setState({ rows });
+  };
+
+
   createRowByOneWithDate = (information) => {
     return {
        risk_id: information.risk_id,
@@ -81,6 +92,9 @@ class Example extends React.Component {
 
   restoreInformation = () => {
     console.log("Im in the restore information");
+    if (this.state.rows.length > 0 ) {
+      alert("You cant restore the values")
+    } else {
     try {
       const urlVendor = 'http://localhost:8080/identification/';
       fetch(urlVendor, {
@@ -93,7 +107,7 @@ class Example extends React.Component {
         .then(data => {
           console.log(data);
           if(data.length === 0) {
-            alert("There is no value to return");
+            alert("There is no date to return");
           } else {
           let rows = this.state.rows.slice();
           console.log("Im in the show");
@@ -108,6 +122,7 @@ class Example extends React.Component {
     } catch(error) {
       console.log("There was a error?" + error)
     }
+  }
   };
 
   addArrow = () => {
@@ -119,11 +134,38 @@ class Example extends React.Component {
   };
 
   saveInformation = () => {
-    console.log("Save information");
-    for (let index = 0; index < this.state.rows.length; index++) {
-      requestPost(this.state.rows[index]);
+    if(this.validateData(this.state.rows)) {
+      console.log("Save information");
+      for (let index = 0; index < this.state.rows.length; index++) {
+        requestPost(this.state.rows[index]);
+      }  
     }
+    
   }
+
+  validateData = (information) =>  {
+    if(information.length > 0 ) {
+      for (let index = 0; index < information.length; index++) {
+        const row = information[index];
+        if ((this.validateFields(row))) {
+          alert("The information in the row " + index + " is incomplete");
+          return false;
+        }
+      }
+      return true;
+    } else {
+      alert("There's no data to insert");
+      return false;
+    }
+  };
+
+  validateFields = (row) => {
+    if ((row.code != '' && row.risk != '' && row.cause != '' && 
+       (row.legal_risk != '' || row.related_risks != '' || row.operative_risk != '' || row.contagious_risk != '' || row.reputational_risk != '' || row.risk_factors != ''))) {
+         return false;
+    }
+    return true;
+  };
 
   getRowAt = (index) => {
     if (index < 0 || index > this.getSize()) {
@@ -161,23 +203,6 @@ class Example extends React.Component {
   }
 }
 
-async function requestGet() {
-  try {
-    const urlVendor = 'http://localhost:8080/identification/';
-    await fetch(urlVendor, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    }).then(response => response.json())
-      .then(data => this.showInformationInTable(data));
-  } catch(error) {
-    console.log("There was a error?" + error)
-  }
-}
-
-
 async function requestPost(params) {
   try {
     const urlVendor = 'http://localhost:8080/identification/';
@@ -197,8 +222,6 @@ async function requestPost(params) {
   }
 
 }
-
-
 
     ReactDOM.render(
         <Example/>,
